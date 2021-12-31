@@ -1,0 +1,14 @@
+ADDHEAD
+(c) Kevin Thacker 1999-2010
+
+A utility to help with cross-development
+of Amstrad CPC software.
+
+This utility will:
+- add a AMSDOS header to a file
+- remove a AMSDOS header from a file
+- warn if a file will exceed a maximum memory address 
+using length and start
+
+Source is distributed under the GNU Public
+License v2.
