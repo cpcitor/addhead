@@ -471,13 +471,13 @@ int	main(int argc, char *argv[])
 		else
 		if ((nOp!=OPERATION_CHECK_LENGTH) && (nOp!=OPERATION_PRINT_HEADER_DATA) && (NumFiles!=2))
 		{
-			fprintf(stderr,"Expected 2 files to be specified!\n");
+			fprintf(stderr,"This operation expects 2 files to be specified!\n");
 			
 			nReturnCode = 1;
 		}
 		else if ((nOp==OPERATION_CHECK_LENGTH) && (NumFiles!=1))
 		{
-			fprintf(stderr,"Expected 1 file to be specified!\n");
+			fprintf(stderr,"This operation expects 1 file to be specified!\n");
 		}
 		else
 		{
