@@ -129,7 +129,8 @@ enum
 	OPERATION_UNKNOWN = 0,
 	OPERATION_ADD_HEADER,
 	OPERATION_REMOVE_HEADER,
-	OPERATION_CHECK_LENGTH
+	OPERATION_CHECK_LENGTH,
+	OPERATION_PRINT_HEADER_DATA
 };
 
 /* buffer to hold generated header data */
@@ -209,6 +210,23 @@ static void AMSDOSHeader_Initialise(char *pData, unsigned long Length)
 	pData[CPC_DISC_HEADER_CHECKSUM_HIGH] = (char)((CalculatedChecksum>>8)&0x0ff);
 }
 
+static void AMSDOSHeader_Print(char *pData) 
+{
+	int nType = DEFAULT_TYPE;
+	nType=pData[CPC_DISC_HEADER_FILE_TYPE];
+	printf("File type: %d (2 means binary, 6 means ascii, bit 0 means protected)\n", nType);
+
+	int nStart = DEFAULT_START;
+	int nExec = DEFAULT_START;
+
+	nStart = pData[CPC_DISC_HEADER_LOCATION_LOW] + 
+		( pData[CPC_DISC_HEADER_LOCATION_HIGH] << 8 );
+	printf("Start address (bytes %d %d): 0x%x\n", CPC_DISC_HEADER_LOCATION_LOW, CPC_DISC_HEADER_LOCATION_HIGH, nStart);
+
+	nExec = pData[CPC_DISC_HEADER_EXECUTION_ADDRESS_LOW] + 
+		( pData[CPC_DISC_HEADER_EXECUTION_ADDRESS_HIGH] << 8 );
+	printf("Execution address: 0x%x\n", nExec);
+}
 
 int ReadNumberParameter(const char *param)
 {
@@ -374,6 +392,13 @@ int CheckLengthOption(ARGUMENT_DATA *pData)
 	return OPTION_OK;
 }
 
+int PrintHeaderOption(ARGUMENT_DATA *pData)
+{
+	nOp = OPERATION_PRINT_HEADER_DATA;
+
+	return OPTION_OK;
+}
+
 
 void	OutputDetails(void)
 {
@@ -386,6 +411,7 @@ void	OutputDetails(void)
 	fprintf(stdout,"\n");
 	fprintf(stdout,"-a     - add a header to file\n");
 	fprintf(stdout,"-r     - remove a existing header\n");
+	fprintf(stdout,"-p     - print existing header\n");
 	fprintf(stdout,"-f     - force operation\n");
 	fprintf(stdout,"-c <number>		- check length against max\n");
 
@@ -410,6 +436,7 @@ OPTION OptionTable[]=
 	{"a",AddHeaderOption},
 	{"r",RemoveHeaderOption},
 	{"c",CheckLengthOption},
+	{"p",PrintHeaderOption},
 	{"f",ForceOption},
 	{"?",OutputDetailsOption},
 
@@ -442,7 +469,7 @@ int	main(int argc, char *argv[])
 			nReturnCode = 0;
 		}
 		else
-		if ((nOp!=OPERATION_CHECK_LENGTH) && (NumFiles!=2))
+		if ((nOp!=OPERATION_CHECK_LENGTH) && (nOp!=OPERATION_PRINT_HEADER_DATA) && (NumFiles!=2))
 		{
 			fprintf(stderr,"Expected 2 files to be specified!\n");
 			
@@ -696,6 +723,27 @@ int	main(int argc, char *argv[])
 							}
 						}
 						break;
+
+
+						case OPERATION_PRINT_HEADER_DATA:
+						{
+							int nStart;
+							int nLength;
+							int Diff;
+
+							printf("Printing header data.\n");
+
+							if (!bSourceHasHeader)
+							{
+								printf("File does not have a valid header\n.");
+								nReturnCode = -1;
+								break;
+							}
+
+							AMSDOSHeader_Print(file_data);
+						}
+						break;
+
 					}
 				}
 			}
