@@ -22,7 +22,7 @@
 #define NULL 0
 #endif
 
-enum
+typedef enum
 {
 	/* no error */
 	OPTION_OK,
@@ -66,4 +66,3 @@ const char *ArgumentList_GetNext(ARGUMENT_DATA *pHandler);
 int Option_VerifyDecimalNumber(const char *pOptionName);
 
 #endif
-
